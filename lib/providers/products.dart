@@ -38,12 +38,29 @@ class Products with ChangeNotifier{
     ),
   ];
 
+  var _showFavoritesOnly = false;
+
   List<Product> get items {
+
+    if(_showFavoritesOnly){
+      return _items.where((prodItem) => prodItem.isFavorite).toList();
+    }
+
     return [..._items];
   }
 
   void addProduct(){
     // _items.add(value);
+    notifyListeners();
+  }
+
+  void showFavoritesOnly() {
+    _showFavoritesOnly = true;
+    notifyListeners();
+  }
+  
+  void showAll() {
+    _showFavoritesOnly = false;
     notifyListeners();
   }
 
