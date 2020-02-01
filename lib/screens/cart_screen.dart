@@ -32,9 +32,9 @@ class CartScreen extends StatelessWidget {
                   onPressed: (){
                     Provider.of<Orders>(context, listen: false).addOrder(cart.items.values.toList(), cart.totalAmount);
                     cart.clear();
-                    Navigator.of(context).pushNamed(
-                      OrdersScreen.routeName
-                    );
+                    // Navigator.of(context).pushNamed(
+                    //   OrdersScreen.routeName
+                    // );
                   }, 
                   textColor: Theme.of(context).primaryColor,)
               ],
