@@ -49,6 +49,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   void _saveForm(){
+    final isValid = _form.currentState.validate();
+    if(!isValid){
+      return;
+    }
     _form.currentState.save();
      print(_editedProduct.title);
      print(_editedProduct.price);
@@ -67,6 +71,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
           child: ListView(
             children: <Widget>[
               TextFormField(
+                validator: (val){
+                  if(val.isEmpty){
+                    return 'Please enter a product title';
+                  }
+                  return null;
+                },
                 decoration: InputDecoration(labelText: 'Title'),
                 textInputAction: TextInputAction.next,
                 onFieldSubmitted: (_){
@@ -83,6 +93,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
               ),
               TextFormField(
+                validator: (val){
+                  if(val.isEmpty){
+                    return 'Please enter a product price';
+                  }
+                  if(double.tryParse(val) == null){
+                    return 'Please enter a valid number';
+                  }
+                  if(double.tryParse(val) <= 0){
+                    return 'Please enter a number greater than zero';
+                  }
+                  return null;
+                },
                 decoration: InputDecoration(labelText: 'Price'),
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.number,
@@ -101,6 +123,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
               ),
               TextFormField(
+                validator: (val){
+                  if(val.isEmpty){
+                    return 'Please enter a product description';
+                  }
+                  if(val.length < 10){
+                    return 'Should be at least 10 characters long';
+                  }
+                  return null;
+                },
                 decoration: InputDecoration(labelText: 'Description'),
                 maxLines: 3,
                 keyboardType: TextInputType.multiline,
@@ -128,6 +159,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   ),
                   Expanded(
                     child: TextFormField(
+                      validator: (val){
+                        if(val.isEmpty){
+                          return 'Please enter an image URL';
+                        }
+                        return null;
+                      },
                       decoration: InputDecoration(labelText: 'Image URL'),
                       keyboardType: TextInputType.url,
                       textInputAction: TextInputAction.done,
