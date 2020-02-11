@@ -48,10 +48,10 @@ class Products with ChangeNotifier{
     return _items.where((prodItem) => prodItem.isFavorite).toList();
   }
 
-  void addProduct(Product product){
+  Future<void> addProduct(Product product){
     const url = 'https://shop-app-fc74f.firebaseio.com/products.json';
 
-    http.post(url, body: json.encode({
+    return http.post(url, body: json.encode({
       'title': product.title,
       'price': product.price,
       'description': product.description,
