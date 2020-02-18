@@ -21,9 +21,12 @@ class Products with ChangeNotifier{
     return http.get(url)
     .then((response){
 
+      print(json.decode(response.body));
+      
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
-
+  
       if(extractedData == null){
+        notifyListeners();
         return;
       }
 
