@@ -16,4 +16,15 @@ class Auth with ChangeNotifier {
     );
     print(json.decode(response.body));
   }
+
+  Future<void> singIn(String email, String password) async {
+    const url = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDMrsf9X3k-q9-b6BPy-EKrvkjOVGIHQsI';
+
+    final response = await http.post(
+      url, 
+      body: json.encode({ 'email': email, 'password': password, 'returnSecureToken': true })
+    );
+    print(json.decode(response.body));
+
+  }
 }
