@@ -8,8 +8,9 @@ class Products with ChangeNotifier{
   List<Product> _items = [];
 
   final String authToken;
+  final String userId;
 
-  Products(this.authToken, this._items);
+  Products(this.authToken, this.userId, this._items);
 
   List<Product> get items {
     return [..._items];
@@ -19,11 +20,10 @@ class Products with ChangeNotifier{
     return _items.where((prodItem) => prodItem.isFavorite).toList();
   }
 
-  Future<void> fetchAndSetProducts(){
-    final url = 'https://shop-app-fc74f.firebaseio.com/products.json?auth=$authToken';
+  Future<void> fetchAndSetProducts() async {
+    var url = 'https://shop-app-fc74f.firebaseio.com/products.json?auth=$authToken';
 
-    return http.get(url)
-    .then((response){
+     final response = await http.get(url);
 
       print(json.decode(response.body));
       
@@ -34,6 +34,9 @@ class Products with ChangeNotifier{
         return;
       }
 
+      url = 'https://shop-app-fc74f.firebaseio.com/userFavorites/$userId.json?auth=$authToken';
+      final favoriteResponse = await http.get(url);
+      final favoriteData = json.decode(favoriteResponse.body);
       final List<Product> loadedProduct = [];
 
       extractedData.forEach((prodId,prodData){
@@ -43,7 +46,7 @@ class Products with ChangeNotifier{
             title: prodData['title'],
             description: prodData['description'],
             price: prodData['price'],
-            isFavorite: prodData['isFavorite'],
+            isFavorite: favoriteData ==  null ? false : favoriteData[prodId] ?? false,
             imageUrl: prodData['imageUrl'],
           )
         );
@@ -51,7 +54,6 @@ class Products with ChangeNotifier{
 
       _items = loadedProduct;
       notifyListeners();
-    });
   }
 
   Future<void> addProduct(Product product){
@@ -61,8 +63,7 @@ class Products with ChangeNotifier{
       'title': product.title,
       'price': product.price,
       'description': product.description,
-      'imageUrl': product.imageUrl,
-      'isFavorite': product.isFavorite
+      'imageUrl': product.imageUrl
     })).then((response){
       print(response);
       final newProduct = Product(title: product.title, id: json.decode(response.body)['name'], price: product.price, description: product.description, imageUrl: product.imageUrl);
