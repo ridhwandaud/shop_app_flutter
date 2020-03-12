@@ -21,7 +21,7 @@ class Products with ChangeNotifier{
   }
 
   Future<void> fetchAndSetProducts() async {
-    var url = 'https://shop-app-fc74f.firebaseio.com/products.json?auth=$authToken';
+    var url = 'https://shop-app-fc74f.firebaseio.com/products.json?auth=$authToken&orderBy="creatorId"&equalTo="$userId"';
 
      final response = await http.get(url);
 
@@ -63,7 +63,8 @@ class Products with ChangeNotifier{
       'title': product.title,
       'price': product.price,
       'description': product.description,
-      'imageUrl': product.imageUrl
+      'imageUrl': product.imageUrl,
+      'creatorId': userId
     })).then((response){
       print(response);
       final newProduct = Product(title: product.title, id: json.decode(response.body)['name'], price: product.price, description: product.description, imageUrl: product.imageUrl);
