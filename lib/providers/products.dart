@@ -20,8 +20,11 @@ class Products with ChangeNotifier{
     return _items.where((prodItem) => prodItem.isFavorite).toList();
   }
 
-  Future<void> fetchAndSetProducts() async {
-    var url = 'https://shop-app-fc74f.firebaseio.com/products.json?auth=$authToken&orderBy="creatorId"&equalTo="$userId"';
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+
+    var filterString = filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
+
+    var url = 'https://shop-app-fc74f.firebaseio.com/products.json?auth=$authToken&$filterString';
 
      final response = await http.get(url);
 
