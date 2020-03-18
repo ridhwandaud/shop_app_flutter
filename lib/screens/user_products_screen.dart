@@ -6,12 +6,45 @@ import '../widgets/app_drawer.dart';
 import '../widgets/user_product_item.dart';
 import '../screens/edit_product_screen.dart';
 
-class UserProductsScreen extends StatelessWidget {
+class UserProductsScreen extends StatefulWidget {
   
   static const routeName = '/manage-products';
 
-  Future<void> _refreshProducts(BuildContext context) async{
-    await Provider.of<Products>(context).fetchAndSetProducts();
+  @override
+  _UserProductsScreenState createState() => _UserProductsScreenState();
+}
+
+class _UserProductsScreenState extends State<UserProductsScreen> {
+  var _isLoading = false;
+
+  @override
+  void initState() {
+    _isLoading = true;
+    Provider.of<Products>(context, listen: false).fetchAndSetProducts(true).then((onValue){
+      _isLoading = false;
+    });
+    super.initState();
+  }
+
+  Future<void> _refreshProducts(BuildContext context) async {
+    try {
+      await Provider.of<Products>(context, listen: false)
+          .fetchAndSetProducts(true);
+    } catch (error) {
+      await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('Error'),
+          content: Text(error.toString()),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () => Navigator.of(ctx).pop(),
+            )
+          ],
+        )
+      );
+    }
   }
 
   @override
@@ -26,21 +59,22 @@ class UserProductsScreen extends StatelessWidget {
           },)
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () => _refreshProducts(context),
-        child: Padding(
-          padding: EdgeInsets.all(8),
-          child: ListView.builder(
-            itemCount: products.items.length,
-            itemBuilder: (ctx,i) => Column(
-              children: <Widget>[
-                UserProductItem(products.items[i].title, products.items[i].imageUrl, products.items[i].id),
-                Divider()
-              ],
-            ),
-          )
+      body: 
+        RefreshIndicator(
+          onRefresh: () => _refreshProducts(context),
+          child: _isLoading ? Center(child: CircularProgressIndicator(),) : Padding(
+            padding: EdgeInsets.all(8),
+            child: ListView.builder(
+              itemCount: products.items.length,
+              itemBuilder: (ctx,i) => Column(
+                children: <Widget>[
+                  UserProductItem(products.items[i].title, products.items[i].imageUrl, products.items[i].id),
+                  Divider()
+                ],
+              ),
+            )
+          ),
         ),
-      ),
       drawer: AppDrawer(),
     );
   }

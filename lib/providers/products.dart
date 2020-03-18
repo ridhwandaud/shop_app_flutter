@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../models/http_execption.dart';
 
 import './product.dart';
 
@@ -20,13 +21,21 @@ class Products with ChangeNotifier{
     return _items.where((prodItem) => prodItem.isFavorite).toList();
   }
 
-  Future<void> fetchAndSetProducts() async {
-    var url = 'https://shop-app-fc74f.firebaseio.com/products.json?auth=$authToken&orderBy="creatorId"&equalTo="$userId"';
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
 
-     final response = await http.get(url);
+    var filterString = filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
+    
 
-      print(json.decode(response.body));
+    try {
+    var url = 'https://shop-app-fc74f.firebaseio.com/products.json?auth=$authToken&$filterString';
+
+      final response = await http.get(url);
+      if (response.statusCode >= 400) {
+        throw HttpException('Couldn\'t fetch Products');
+      }
       
+      print(json.decode(response.body));
+
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
   
       if(extractedData == null){
@@ -54,6 +63,9 @@ class Products with ChangeNotifier{
 
       _items = loadedProduct;
       notifyListeners();
+    } catch (error) {
+      throw (error);
+    }
   }
 
   Future<void> addProduct(Product product){
