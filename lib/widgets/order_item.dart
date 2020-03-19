@@ -44,7 +44,7 @@ class _OrderItemState extends State<OrderItem> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text(prod.title),
+                      Text(prod.title, style: TextStyle(color: Colors.grey, fontSize: 20, fontWeight: FontWeight.bold),),
                       Text('${prod.quantity} x'),
                       Text('\$${prod.price * prod.quantity}')
                     ],
